@@ -1,3 +1,45 @@
-from django.shortcuts import render
+from django.conf import settings
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
-# Create your views here.
+
+@api_view(["POST"])
+def search(request):
+    prompt = (
+        request.data.get("message")
+        or request.data.get("prompt")
+        or request.data.get("query")
+    )
+
+    if not prompt:
+        return Response(
+            {"detail": "Send message, prompt, or query."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    if not settings.GOOGLE_API_KEY:
+        return Response(
+            {"detail": "GOOGLE_API_KEY is not configured."},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+    try:
+        import google.generativeai as genai
+
+        genai.configure(api_key=settings.GOOGLE_API_KEY)
+        model = genai.GenerativeModel("gemini-2.5-flash")
+        response = model.generate_content(prompt)
+    except ImportError:
+        return Response(
+            {"detail": "Install google-generativeai to use AI requests."},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+    except Exception as exc:
+        return Response(
+            {"detail": "AI request failed.", "error": str(exc)},
+            status=status.HTTP_502_BAD_GATEWAY,
+        )
+
+    return Response({"answer": response.text})
+
