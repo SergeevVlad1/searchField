@@ -66,15 +66,69 @@ export const SearchForm = () => {
   return (
     <section className="search">
       <form className="search__form" onSubmit={handleSubmit}>
-        <Input
-          aria-label="Сообщение для ИИ"
-          className="search__input"
-          disabled={searchMutation.isPending}
-          onChange={(event) => setMessage(event.target.value)}
-          placeholder="Спросите что-нибудь"
-          type="text"
-          value={message}
-        />
+        <div className="search__bar">
+          <button
+            aria-label="Голосовой ввод"
+            className="search__icon-button search__icon-button--voice"
+            disabled={isListening}
+            onClick={handleVoiceInput}
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              className="search__icon"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M12 4a3 3 0 0 0-3 3v5a3 3 0 1 0 6 0V7a3 3 0 0 0-3-3Z"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+              />
+              <path
+                d="M5 11a7 7 0 0 0 14 0M12 18v3"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+              />
+            </svg>
+          </button>
+
+          <Input
+            aria-label="Сообщение для ИИ"
+            className="search__input"
+            disabled={searchMutation.isPending}
+            onChange={(event) => setMessage(event.target.value)}
+            placeholder="Ask whatever you want"
+            type="text"
+            value={message}
+          />
+
+          <button
+            aria-label="Отправить сообщение"
+            className="search__icon-button search__icon-button--submit"
+            disabled={isSubmitDisabled}
+            type="submit"
+          >
+            <svg
+              aria-hidden="true"
+              className="search__icon"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="m9 5 7 7-7 7"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2.6"
+              />
+            </svg>
+          </button>
+        </div>
 
         <label className="search__select-field">
           <span className="search__select-label">Voice language</span>
@@ -91,23 +145,6 @@ export const SearchForm = () => {
             ))}
           </select>
         </label>
-
-        <button
-          className="search__button"
-          disabled={isListening}
-          onClick={handleVoiceInput}
-          type="button"
-        >
-          {isListening ? "Слушаю..." : "Говорить"}
-        </button>
-
-        <button
-          className="search__button search__button--primary"
-          disabled={isSubmitDisabled}
-          type="submit"
-        >
-          {searchMutation.isPending ? "Отправка..." : "Отправить"}
-        </button>
       </form>
 
       {voiceError && <p className="search__error">{voiceError}</p>}
