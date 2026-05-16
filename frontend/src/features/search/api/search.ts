@@ -1,8 +1,5 @@
 import { EMethodHTTP, handleResponse } from "../../../shared/api/base";
 
-// export interface IData {
-//   message: string;
-// }
 var url = "http://127.0.0.1:8000/";
 
 export const provideSearch = async (data: string) => {

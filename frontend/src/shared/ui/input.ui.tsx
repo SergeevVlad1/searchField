@@ -1,34 +1,7 @@
-export enum EInputType {
-  text = "text",
-  email = "email",
-  password = "password",
-}
+import type { InputHTMLAttributes } from "react";
 
-interface InputProps {
-  type: EInputType;
-  placeholder?: string;
-  onChange?:
-    | React.ChangeEventHandler<HTMLInputElement, HTMLInputElement>
-    | undefined;
-  value?: string;
-  text?: string;
-}
+type InputProps = InputHTMLAttributes<HTMLInputElement>;
 
-export const Input = ({
-  type,
-  placeholder,
-  onChange,
-  value,
-  text,
-}: InputProps) => {
-  return (
-    <input
-      type={type}
-      onChange={onChange}
-      value={value}
-      placeholder={placeholder}
-    >
-      {text}
-    </input>
-  );
+export const Input = (props: InputProps) => {
+  return <input {...props} />;
 };
