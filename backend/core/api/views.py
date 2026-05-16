@@ -4,20 +4,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 
-@api_view(["POST"])
-def search(request):
-    prompt = (
-        request.data.get("message")
-        or request.data.get("prompt")
-        or request.data.get("query")
-    )
-
-    if not prompt:
-        return Response(
-            {"detail": "Send message, prompt, or query."},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
-
+def generate_ai_answer(prompt):
     if not settings.GOOGLE_API_KEY:
         return Response(
             {"detail": "GOOGLE_API_KEY is not configured."},
@@ -42,4 +29,28 @@ def search(request):
         )
 
     return Response({"answer": response.text})
+
+
+@api_view(["GET", "POST"])
+def search(request):
+    if request.method == "GET":
+        prompt = (
+            request.query_params.get("message")
+            or request.query_params.get("prompt")
+            or request.query_params.get("query")
+        )
+    else:
+        prompt = (
+            request.data.get("message")
+            or request.data.get("prompt")
+            or request.data.get("query")
+        )
+
+    if not prompt:
+        return Response(
+            {"detail": "Send message, prompt, or query."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    return generate_ai_answer(prompt)
 
