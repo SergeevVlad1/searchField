@@ -2,10 +2,17 @@ import { type FormEvent, useState } from "react";
 import { useSearchMutation } from "../api/use-search-mutation";
 import { Input } from "../../../shared/ui/input.ui";
 
+const voiceLanguages = [
+  { label: "English", value: "en-US" },
+  { label: "Russian", value: "ru-RU" },
+  { label: "Spanish", value: "es-ES" },
+] as const;
+
 export const SearchForm = () => {
   const [message, setMessage] = useState("");
   const [isListening, setIsListening] = useState(false);
   const [voiceError, setVoiceError] = useState("");
+  const [language, setLanguage] = useState("ru-RU");
   const searchMutation = useSearchMutation();
 
   const trimmedMessage = message.trim();
@@ -32,7 +39,7 @@ export const SearchForm = () => {
 
     const recognition = new SpeechRecognition();
 
-    recognition.lang = "ru-RU";
+    recognition.lang = language;
     recognition.interimResults = false;
     recognition.continuous = false;
 
@@ -68,6 +75,23 @@ export const SearchForm = () => {
           type="text"
           value={message}
         />
+
+        <label className="search__select-field">
+          <span className="search__select-label">Voice language</span>
+          <select
+            className="search__select"
+            disabled={isListening}
+            value={language}
+            onChange={(event) => setLanguage(event.target.value)}
+          >
+            {voiceLanguages.map((voiceLanguage) => (
+              <option key={voiceLanguage.value} value={voiceLanguage.value}>
+                {voiceLanguage.label}
+              </option>
+            ))}
+          </select>
+        </label>
+
         <button
           className="search__button"
           disabled={isListening}
@@ -76,6 +100,7 @@ export const SearchForm = () => {
         >
           {isListening ? "Слушаю..." : "Говорить"}
         </button>
+
         <button
           className="search__button search__button--primary"
           disabled={isSubmitDisabled}
