@@ -141,8 +141,8 @@ else:
     if env_path.exists():
         for line in env_path.read_text().splitlines():
             key, separator, value = line.partition("=")
-            if separator and key.strip() == "GOOGLE_API_KEY":
-                os.environ.setdefault("GOOGLE_API_KEY", value.strip())
-                break
+            if separator:
+                os.environ.setdefault(key.strip(), value.strip())
 
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
+MISTRAL_MODEL = os.getenv("MISTRAL_MODEL", "mistral-small-latest")

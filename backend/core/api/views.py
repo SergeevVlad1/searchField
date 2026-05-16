@@ -1,3 +1,7 @@
+import json
+from urllib.error import HTTPError, URLError
+from urllib.request import Request, urlopen
+
 from django.conf import settings
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -5,30 +9,50 @@ from rest_framework.response import Response
 
 
 def generate_ai_answer(prompt):
-    if not settings.GOOGLE_API_KEY:
+    if not settings.MISTRAL_API_KEY:
         return Response(
-            {"detail": "GOOGLE_API_KEY is not configured."},
+            {"detail": "MISTRAL_API_KEY is not configured."},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
+
+    payload = {
+        "model": settings.MISTRAL_MODEL,
+        "messages": [
+            {
+                "role": "user",
+                "content": prompt,
+            }
+        ],
+    }
+    request = Request(
+        "https://api.mistral.ai/v1/chat/completions",
+        data=json.dumps(payload).encode("utf-8"),
+        headers={
+            "Authorization": f"Bearer {settings.MISTRAL_API_KEY}",
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+        },
+        method="POST",
+    )
 
     try:
-        import google.generativeai as genai
-
-        genai.configure(api_key=settings.GOOGLE_API_KEY)
-        model = genai.GenerativeModel("gemini-2.5-flash")
-        response = model.generate_content(prompt)
-    except ImportError:
+        with urlopen(request, timeout=30) as response:
+            response_data = json.loads(response.read().decode("utf-8"))
+    except HTTPError as exc:
+        error_body = exc.read().decode("utf-8")
         return Response(
-            {"detail": "Install google-generativeai to use AI requests."},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            {"detail": "AI request failed.", "error": error_body},
+            status=status.HTTP_502_BAD_GATEWAY,
         )
-    except Exception as exc:
+    except (URLError, TimeoutError) as exc:
         return Response(
             {"detail": "AI request failed.", "error": str(exc)},
             status=status.HTTP_502_BAD_GATEWAY,
         )
 
-    return Response({"answer": response.text})
+    answer = response_data["choices"][0]["message"]["content"]
+
+    return Response({"answer": answer})
 
 
 @api_view(["GET", "POST"])
