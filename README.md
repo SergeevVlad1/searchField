@@ -1,6 +1,11 @@
 # SearchField
 
-SearchField is a small full-stack AI search/chat demo. The frontend lets a user type or dictate a message, sends it to a Django API, and the backend forwards the prompt to Mistral AI.
+SearchField - это full-stack приложение для общения с ИИ через текстовый и голосовой ввод. Пользователь может ввести вопрос вручную или продиктовать его через микрофон, выбрать язык распознавания речи и отправить запрос в backend. Сервер на Django принимает сообщение, передаёт его в Mistral AI API и возвращает готовый ответ на frontend.
+
+Пример современной связки React + TypeScript + Django REST. Frontend построен с разделением по FSD-подходу: общие API-инструменты лежат в shared, логика AI-поиска в features/search, а страница только подключает готовую фичу. Для запросов используется TanStack React Query, а голосовой ввод работает через browser Web Speech API.
+
+Основная цель проекта - показать полный цикл работы с AI API: ввод данных пользователем, отправка запроса на backend, обращение к внешней LLM API, обработка ответа и отображение результата в интерфейсе.
+
 
 ## Features
 
